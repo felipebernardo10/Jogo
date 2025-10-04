@@ -3,6 +3,7 @@
 #include "opencv2/imgproc.hpp"
 #include "opencv2/videoio.hpp"
 #include <iostream>
+#include "Recorde.h"
 #include <ctime>
 
 using namespace std;
@@ -21,6 +22,7 @@ struct Pipe {
     int gapY;
     int width;
     int gapHeight;
+    bool contado = false;
 };
 
 // Lista de canos
@@ -56,6 +58,8 @@ Pipe createPipe(int screenWidth, int screenHeight) {
 }
 
 int main() {
+    Recorde rec;
+    vector<Pipe> canos;
     srand(time(0));
 
     VideoCapture capture;
@@ -122,7 +126,7 @@ int main() {
         }
         if (pipes.front().x + pipes.front().width < 0) {
             pipes.erase(pipes.begin());
-            score++;
+            
         }
 
         // Desenha canos
@@ -137,6 +141,15 @@ int main() {
                 }
             }
         }
+        for (auto &p : pipes) {
+            if (!p.contado && birdPos.x > p.x + p.width) {
+                score++;
+                p.contado = true;
+            }
+        }
+
+        imshow(wName, frame);
+
 
         // Desenha o pássaro como a laranja
         drawImage(smallFrame, orange, birdPos.x - orange.cols / 2, birdPos.y - orange.rows / 2);
@@ -149,13 +162,21 @@ int main() {
         key = (char)waitKey(20);
         if (key == 27 || key == 'q') break;
     }
+    
 
     // Tela final
     Mat fim(screenHeight, screenWidth, CV_8UC3, Scalar(0, 0, 0));
     putText(fim, "Perdeste Friend", Point(100, screenHeight / 2), FONT_HERSHEY_DUPLEX, 2, Scalar(0, 0, 255), 3);
     putText(fim, "Pontos: " + to_string(score), Point(100, screenHeight / 2 + 60), FONT_HERSHEY_PLAIN, 2, Scalar(255, 255, 255), 2);
+    putText(fim, "Pressione alguma tecla para continuar", Point(100, screenHeight / 2 + 120), FONT_HERSHEY_SIMPLEX, 0.8, Scalar(200, 200, 200), 2);
     imshow(wName, fim);
     waitKey(5000);
-
+    
+    rec.mostrar();             
+    
+    destroyAllWindows();  
+    waitKey(1);
+    
+    rec.verificarNovoRecorde(score);
     return 0;
 }
