@@ -4,6 +4,7 @@
 #include "opencv2/videoio.hpp"
 #include <iostream>
 #include "Recorde.h"
+#include "Menu.h"
 #include <ctime>
 #include <cstdlib> 
 
@@ -60,6 +61,23 @@ Pipe createPipe(int screenWidth, int screenHeight) {
 }
 
 int main() {
+    Menu menu;
+    int opcao;
+
+    while (true) {
+        opcao = menu.exibir();
+
+        if (opcao == 1) {
+            
+            break; // sai do menu e começa o jogo normal
+        }
+        else if (opcao == 2) {
+            menu.mostrarRecorde();
+        }
+        else if (opcao == 3) {
+            menu.mostrarCreditos();
+        }
+    }
     Recorde rec;
     vector<Pipe> canos;
     srand(time(0));
