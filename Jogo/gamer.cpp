@@ -5,6 +5,8 @@
 #include <iostream>
 #include "Recorde.h"
 #include <ctime>
+#include <cstdlib> 
+
 
 using namespace std;
 using namespace cv;
@@ -138,6 +140,7 @@ int main() {
             if (birdPos.x > p.x && birdPos.x < p.x + p.width) {
                 if (birdPos.y < p.gapY - p.gapHeight / 2 || birdPos.y > p.gapY + p.gapHeight / 2) {
                     vidas = 0;
+                    system("aplay sons/fail.wav &");
                 }
             }
         }
@@ -145,6 +148,7 @@ int main() {
             if (!p.contado && birdPos.x > p.x + p.width) {
                 score++;
                 p.contado = true;
+                system("aplay sons/ping.wav &");
             }
         }
 
