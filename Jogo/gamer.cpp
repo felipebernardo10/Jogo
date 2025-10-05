@@ -198,6 +198,8 @@ int main() {
     
     destroyAllWindows();  
     waitKey(1);
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
     
     rec.verificarNovoRecorde(score);
     return 0;
