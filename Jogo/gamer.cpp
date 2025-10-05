@@ -8,7 +8,6 @@
 #include <ctime>
 #include <cstdlib> 
 
-
 using namespace std;
 using namespace cv;
 
@@ -19,7 +18,7 @@ int vidas = 1;
 int score = 0;
 time_t startTime;
 float velocidade = 10.0;
-
+bool recordeBatido = false;
 
 // Cano
 struct Pipe {
@@ -64,13 +63,13 @@ Pipe createPipe(int screenWidth, int screenHeight) {
 
 int main() {
     Menu menu;
+    Recorde rec; // Mover para antes do loop do jogo
     int opcao;
 
     while (true) {
         opcao = menu.exibir();
 
         if (opcao == 1) {
-            
             break; // sai do menu e começa o jogo normal
         }
         else if (opcao == 2) {
@@ -80,7 +79,7 @@ int main() {
             menu.mostrarCreditos();
         }
     }
-    Recorde rec;
+
     vector<Pipe> canos;
     srand(time(0));
 
@@ -148,7 +147,6 @@ int main() {
         }
         if (pipes.front().x + pipes.front().width < 0) {
             pipes.erase(pipes.begin());
-            
         }
 
         // Desenha canos
@@ -164,44 +162,56 @@ int main() {
                 }
             }
         }
+
         // Score
-    for (auto &p : pipes) {
-    if (!p.contado && birdPos.x > p.x + p.width) {
-        score++;
-        p.contado = true;
+        for (auto &p : pipes) {
+            if (!p.contado && birdPos.x > p.x + p.width) {
+                score++;
+                p.contado = true;
 
-        
-        system("aplay sons/ping.wav &");
+                // Verifica se bateu o recorde
+                if (score > rec.getPontos() && !recordeBatido) {
+                    recordeBatido = true;
+                    system("aplay sons/recorde.wav &"); // Adicione um som especial para recorde
+                }
 
-        //  Aumenta velocidade a cada 3 pontos
-        if (score % 3 == 0) {
-            velocidade += 0.8;
+                // Som de pontuação
+                system("aplay sons/ping.wav &");
+
+                // ⚡ Aumenta velocidade a cada 3 pontos
+                if (score % 3 == 0) {
+                    velocidade += 1.0;
+                }
+            }
         }
-    }
-}
-
-
-        imshow(wName, frame);
-
 
         // Desenha o pássaro como a laranja
         drawImage(smallFrame, orange, birdPos.x - orange.cols / 2, birdPos.y - orange.rows / 2);
 
-        // HUD
+        // HUD - Pontuação e Recorde
         putText(smallFrame, "Pontos: " + to_string(score), Point(20, 50), FONT_HERSHEY_PLAIN, 2, Scalar(255, 255, 255), 2);
+putText(smallFrame, "Recorde: " + to_string(rec.getPontos()), Point(20, 90), FONT_HERSHEY_PLAIN, 2, Scalar(255, 255, 0), 2);
+        // Aviso de recorde batido
+        if (recordeBatido) {
+            putText(smallFrame, "NOVO RECORDE!", Point(screenWidth/2 - 80, 80), FONT_HERSHEY_DUPLEX, 1.2, Scalar(0, 255, 255), 3);
+        }
 
         imshow(wName, smallFrame);
 
         key = (char)waitKey(20);
         if (key == 27 || key == 'q') break;
     }
-    
 
     // Tela final
     Mat fim(screenHeight, screenWidth, CV_8UC3, Scalar(0, 0, 0));
     putText(fim, "Perdeste Friend", Point(100, screenHeight / 2), FONT_HERSHEY_DUPLEX, 2, Scalar(0, 0, 255), 3);
     putText(fim, "Pontos: " + to_string(score), Point(100, screenHeight / 2 + 60), FONT_HERSHEY_PLAIN, 2, Scalar(255, 255, 255), 2);
-    putText(fim, "Pressione alguma tecla para continuar", Point(100, screenHeight / 2 + 120), FONT_HERSHEY_SIMPLEX, 0.8, Scalar(200, 200, 200), 2);
+    
+    if (recordeBatido) {
+        putText(fim, "NOVO RECORDE ALCANCADO!", Point(100, screenHeight / 2 + 120), FONT_HERSHEY_DUPLEX, 1.0, Scalar(0, 255, 255), 3);
+    }
+    
+    putText(fim, "Pressione alguma tecla para continuar", Point(100, screenHeight / 2 + 180), FONT_HERSHEY_SIMPLEX, 0.8, Scalar(200, 200, 200), 2);
     imshow(wName, fim);
     waitKey(5000);
     
