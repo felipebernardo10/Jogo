@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -9,14 +8,13 @@ using namespace std;
 class Recorde {
 private:
     string nome;
-    int pontos;
     string arquivo;
+    int pontos;
 
 public:
     Recorde(string nomeArquivo = "record.txt") {
         arquivo = nomeArquivo;
         nome = "Ninguém";
-        pontos = 0;
         carregar();
     }
 
@@ -59,6 +57,9 @@ public:
             cout << "Você não bateu o recorde. Tente novamente!" << endl;
         }
     }
+
+    
+    int getPontos() const {
+        return pontos;
+    }
 };
-
-
