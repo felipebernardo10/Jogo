@@ -18,6 +18,8 @@ string wName = "Flappy Face";
 int vidas = 1;
 int score = 0;
 time_t startTime;
+float velocidade = 10.0;
+
 
 // Cano
 struct Pipe {
@@ -139,7 +141,7 @@ int main() {
 
         // Atualiza canos
         for (auto &p : pipes) {
-            p.x -= 10; // velocidade dos canos
+            p.x -= velocidade; // velocidade dos canos
         }
         if (pipes.back().x < screenWidth - 200) {
             pipes.push_back(createPipe(screenWidth, screenHeight));
@@ -162,13 +164,22 @@ int main() {
                 }
             }
         }
-        for (auto &p : pipes) {
-            if (!p.contado && birdPos.x > p.x + p.width) {
-                score++;
-                p.contado = true;
-                system("aplay sons/ping.wav &");
-            }
+        // Score
+    for (auto &p : pipes) {
+    if (!p.contado && birdPos.x > p.x + p.width) {
+        score++;
+        p.contado = true;
+
+        
+        system("aplay sons/ping.wav &");
+
+        //  Aumenta velocidade a cada 3 pontos
+        if (score % 3 == 0) {
+            velocidade += 0.8;
         }
+    }
+}
+
 
         imshow(wName, frame);
 
